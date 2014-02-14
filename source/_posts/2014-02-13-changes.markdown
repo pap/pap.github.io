@@ -1,0 +1,36 @@
+---
+layout: post
+title: "Changes"
+date: 2014-02-13 18:26:08 +0000
+comments: true
+categories:
+---
+
+> **They always say time changes things, but you actually have to change them yourself.**<br/><cite>Andy Warhol</cite>
+
+
+<br/>
+####Change #1
+
+So i've finally decided to change things, since time itself wouldn't move my [blog](http://remoteexception.blogspot.com) over to github.
+
+Initially i started the blog to hold portuguese translations of a weekly Burt Beckwith's compilation of Grails related info.
+
+It's time to blog more often.
+
+**Change #2**
+
+But in the last 3 years a lot has changed. I went from Grails to Rails, deployed a complex application and those steps lead me here ...
+
+Here is where ?
+
+Well here is deciding to learn a functional programming language.
+
+Here is deciding to keep on walking, one step at a time, towards the path of lesser complexity.
+
+Here is Erlang and Elixir.
+
+**Change #3**
+
+I've also decided it was time to change from Sublime Text to something more terse. And i did. After a couple of days i've uninstalled Sublime and i'm now a happy vim learner.
+
