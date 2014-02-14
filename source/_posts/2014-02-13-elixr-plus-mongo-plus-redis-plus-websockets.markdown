@@ -1,9 +1,9 @@
 ---
 layout: post
-title: "Elixir+Mongo+Redis+Websockets"
+title: "Elixir websockets+Mongo+Redis (1)"
 date: 2014-02-13 23:20:23 +0000
 comments: true
-categories:
+categories: [programming, elixir]
 ---
 
 A few months ago a fellow developer was architecting a new app (soon to be launched) and he had a problem to solve:
