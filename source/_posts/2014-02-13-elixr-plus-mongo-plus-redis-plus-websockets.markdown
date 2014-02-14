@@ -6,13 +6,13 @@ comments: true
 categories:
 ---
 
-A few months ago a fellow developer was architecting a new app (soon to be launched) and he had a problema to solve:
+A few months ago a fellow developer was architecting a new app (soon to be launched) and he had a problem to solve:
 
   __Provide realtime updates in one or several devices after an event triggered by one of those devices__
 
 It had to be fault tolerant, performant... well, business as usual !
 
-By the time i was quite interested in Elixir, and i offered to prototype a solution. It just felt the right tool for the job.
+By the time i was quite interested in Erlang/Elixir, and i offered to prototype a solution. It just felt the right tool for the job.
 
 All in all it was not that different of the canonical "hello world" of the Erlang VM languages ... the chatroom example.
 
