@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Remote Exception]]></title>
+  <link href="http://pap.github.io/atom.xml" rel="self"/>
+  <link href="http://pap.github.io/"/>
+  <updated>2014-02-14T00:39:07+00:00</updated>
+  <id>http://pap.github.io/</id>
+  <author>
+    <name><![CDATA[Paulo A Pereira]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Elixir+Mongo+Redis+Websockets]]></title>
+    <link href="http://pap.github.io/blog/2014/02/13/elixr-plus-mongo-plus-redis-plus-websockets/"/>
+    <updated>2014-02-13T23:20:23+00:00</updated>
+    <id>http://pap.github.io/blog/2014/02/13/elixr-plus-mongo-plus-redis-plus-websockets</id>
+    <content type="html"><![CDATA[<p>A few months ago a fellow developer was architecting a new app (soon to be launched) and he had a problema to solve:</p>
+
+<p>  <strong>Provide realtime updates in one or several devices after an event triggered by one of those devices</strong></p>
+
+<p>It had to be fault tolerant, performant&hellip; well, business as usual !</p>
+
+<p>By the time i was quite interested in Elixir, and i offered to prototype a solution. It just felt the right tool for the job.</p>
+
+<p>All in all it was not that different of the canonical &ldquo;hello world&rdquo; of the Erlang VM languages &hellip; the chatroom example.</p>
+
+<p>After a few days trying to find documentation and examples on websocket use i was able to prototype something in Erlang with <a href="https://github.com/extend/cowboy">cowboy</a>.</p>
+
+<p>Then things changed a bit. Prior to websocket connection &ldquo;validation&rdquo; a user should have a valid key stored in a database.
+And there would be a Redis channel to publish messages that had to be routed to a subset of the registered connected users.</p>
+
+<p>It was time to refactor.</p>
+
+<p>I opted to use <a href="http://elixir-lang.org">Elixir</a> and i&rsquo;ve also added <a href="https://github.com/extend/bullet">bullet</a> <sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> to my previous cowboy setup.
+I also had to integrate a few libraries to:</p>
+
+<ul>
+<li>parse and output json</li>
+<li>connect to a database to verify identity</li>
+<li>subscribe to a Redis channel and listen to messages</li>
+</ul>
+
+
+<p>I knew it would be a risk to chose a language which being actively developed (currently in version 0.12.4) but it just felt right !</p>
+
+<p>On my next post i&rsquo;ll dive into implementation details.</p>
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p><em>&ldquo;Bullet is a Cowboy handler and associated Javascript library for maintaining a persistent connection between a client and a server.&rdquo;</em><a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Changes]]></title>
+    <link href="http://pap.github.io/blog/2014/02/13/changes/"/>
+    <updated>2014-02-13T18:26:08+00:00</updated>
+    <id>http://pap.github.io/blog/2014/02/13/changes</id>
+    <content type="html"><![CDATA[<blockquote><p><strong>They always say time changes things, but you actually have to change them yourself.</strong><br/><cite>Andy Warhol</cite></p></blockquote>
+
+<br/>
+
+
+<h4>Change #1</h4>
+
+<p>So i&rsquo;ve finally decided to change things, since time itself wouldn&rsquo;t move my <a href="http://remoteexception.blogspot.com">blog</a> over to github.</p>
+
+<p>Initially i started the blog to hold portuguese translations of a weekly Burt Beckwith&rsquo;s compilation of Grails related info.</p>
+
+<p>It&rsquo;s time to blog more often.</p>
+
+<p><strong>Change #2</strong></p>
+
+<p>But in the last 3 years a lot has changed. I went from Grails to Rails, deployed a complex application and those steps lead me here &hellip;</p>
+
+<p>Here is where ?</p>
+
+<p>Well here is deciding to learn a functional programming language.</p>
+
+<p>Here is deciding to keep on walking, one step at a time, towards the path of lesser complexity.</p>
+
+<p>Here is Erlang and Elixir.</p>
+
+<p><strong>Change #3</strong></p>
+
+<p>I&rsquo;ve also decided it was time to change from Sublime Text to something more terse. And i did. After a couple of days i&rsquo;ve uninstalled Sublime and i&rsquo;m now a happy vim learner.</p>
+]]></content>
+  </entry>
+  
+</feed>

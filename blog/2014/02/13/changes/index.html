@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Remote Exception</title>
+  <title>Changes - Remote Exception</title>
   <meta name="author" content="Paulo A Pereira">
 
   
-  <meta name="description" content="A few months ago a fellow developer was architecting a new app (soon to be launched) and he had a problema to solve: Provide realtime updates in one &hellip;">
+  <meta name="description" content="They always say time changes things, but you actually have to change them yourself.Andy Warhol Change #1 So i&rsquo;ve finally decided to change &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://pap.github.io/">
+  <link rel="canonical" href="http://pap.github.io/blog/2014/02/13/changes/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
    <link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
@@ -79,88 +79,12 @@
 </nav> -->
   <div id="main">
     <div id="content">
-      <div class="blog-index">
+      <div>
+<article class="hentry" role="article">
   
-  
-  
-    <article>
-      
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2014/02/13/elixr-plus-mongo-plus-redis-plus-websockets/">Elixir+Mongo+Redis+Websockets</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2014-02-13T23:20:23+00:00" pubdate data-updated="true">2014/02/13</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>A few months ago a fellow developer was architecting a new app (soon to be launched) and he had a problema to solve:</p>
-
-<p>  <strong>Provide realtime updates in one or several devices after an event triggered by one of those devices</strong></p>
-
-<p>It had to be fault tolerant, performant&hellip; well, business as usual !</p>
-
-<p>By the time i was quite interested in Elixir, and i offered to prototype a solution. It just felt the right tool for the job.</p>
-
-<p>All in all it was not that different of the canonical &ldquo;hello world&rdquo; of the Erlang VM languages &hellip; the chatroom example.</p>
-
-<p>After a few days trying to find documentation and examples on websocket use i was able to prototype something in Erlang with <a href="https://github.com/extend/cowboy">cowboy</a>.</p>
-
-<p>Then things changed a bit. Prior to websocket connection &ldquo;validation&rdquo; a user should have a valid key stored in a database.
-And there would be a Redis channel to publish messages that had to be routed to a subset of the registered connected users.</p>
-
-<p>It was time to refactor.</p>
-
-<p>I opted to use <a href="http://elixir-lang.org">Elixir</a> and i&rsquo;ve also added <a href="https://github.com/extend/bullet">bullet</a> <sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> to my previous cowboy setup.
-I also had to integrate a few libraries to:</p>
-
-<ul>
-<li>parse and output json</li>
-<li>connect to a database to verify identity</li>
-<li>subscribe to a Redis channel and listen to messages</li>
-</ul>
-
-
-<p>I knew it would be a risk to chose a language which being actively developed (currently in version 0.12.4) but it just felt right !</p>
-
-<p>On my next post i&rsquo;ll dive into implementation details.</p>
-<div class="footnotes">
-<hr/>
-<ol>
-<li id="fn:1">
-<p><em>&ldquo;Bullet is a Cowboy handler and associated Javascript library for maintaining a persistent connection between a client and a server.&rdquo;</em><a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
-</ol>
-</div>
-
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2014/02/13/changes/">Changes</a></h1>
+      <h1 class="entry-title">Changes</h1>
     
     
       <p class="meta">
@@ -183,7 +107,7 @@ I also had to integrate a few libraries to:</p>
   </header>
 
 
-  <div class="entry-content"><blockquote><p><strong>They always say time changes things, but you actually have to change them yourself.</strong><br/><cite>Andy Warhol</cite></p></blockquote>
+<div class="entry-content"><blockquote><p><strong>They always say time changes things, but you actually have to change them yourself.</strong><br/><cite>Andy Warhol</cite></p></blockquote>
 
 <br/>
 
@@ -212,18 +136,59 @@ I also had to integrate a few libraries to:</p>
 
 <p>I&rsquo;ve also decided it was time to change from Sublime Text to something more terse. And i did. After a couple of days i&rsquo;ve uninstalled Sublime and i&rsquo;m now a happy vim learner.</p>
 </div>
+
+
+  <footer>
+    <p class="meta">
+      
   
+
+<span class="byline author vcard">Posted by <span class="fn">Paulo A Pereira</span></span>
+
+      
+
+
+
+
+
+
+
+
   
 
 
-    </article>
+<time datetime="2014-02-13T18:26:08+00:00" pubdate data-updated="true">2014/02/13</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
   
-  <div class="pagination">
-    
-    <a href="/blog/archives/"> Archives </a>
-    
-  </div>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://pap.github.io/blog/2014/02/13/changes/" data-via="odesassossegado" data-counturl="http://pap.github.io/blog/2014/02/13/changes/" >Tweet</a>
+  
+  
+  
 </div>
+
+    
+    <p class="meta">
+      
+      
+        <a class="basic-alignment right" href="/blog/2014/02/13/elixr-plus-mongo-plus-redis-plus-websockets/" title="Next Post: Elixir+Mongo+Redis+Websockets">Elixir+Mongo+Redis+Websockets &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
 <aside class="sidebar">
   
     
@@ -235,7 +200,7 @@ I also had to integrate a few libraries to:</p>
 
 <section id="titles">
   <h1 id="site_title"><a href="http://pap.github.io" title="Remote Exception">Remote Exception</a></h1>
-  <h3 id="site_subtitle">things tend to happen &#8230;</h3>
+  <h3 id="site_subtitle">things tend to happen ...</h3>
 </section>
 
 <section id="menu">
@@ -284,7 +249,7 @@ I also had to integrate a few libraries to:</p>
 <section>
   <h1>GitHub Repos</h1>
   <ul id="gh_repos">
-    <li class="loading">Status updating&#8230;</li>
+    <li class="loading">Status updating...</li>
   </ul>
   
   <a href="https://github.com/pap">@pap</a> on GitHub
@@ -317,6 +282,7 @@ I also had to integrate a few libraries to:</p>
   
 </aside>
 
+
     </div>
   </div>
   <footer role="contentinfo"><p>
@@ -331,7 +297,10 @@ I also had to integrate a few libraries to:</p>
       var disqus_shortname = 'desassossego';
       
         
-        var disqus_script = 'count.js';
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://pap.github.io/blog/2014/02/13/changes/';
+        var disqus_url = 'http://pap.github.io/blog/2014/02/13/changes/';
+        var disqus_script = 'embed.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
