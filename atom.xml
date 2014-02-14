@@ -4,7 +4,7 @@
   <title><![CDATA[Remote Exception]]></title>
   <link href="http://pap.github.io/atom.xml" rel="self"/>
   <link href="http://pap.github.io/"/>
-  <updated>2014-02-14T00:45:46+00:00</updated>
+  <updated>2014-02-14T00:58:05+00:00</updated>
   <id>http://pap.github.io/</id>
   <author>
     <name><![CDATA[Paulo A Pereira]]></name>
@@ -18,13 +18,13 @@
     <link href="http://pap.github.io/blog/2014/02/13/elixr-plus-mongo-plus-redis-plus-websockets/"/>
     <updated>2014-02-13T23:20:23+00:00</updated>
     <id>http://pap.github.io/blog/2014/02/13/elixr-plus-mongo-plus-redis-plus-websockets</id>
-    <content type="html"><![CDATA[<p>A few months ago a fellow developer was architecting a new app (soon to be launched) and he had a problema to solve:</p>
+    <content type="html"><![CDATA[<p>A few months ago a fellow developer was architecting a new app (soon to be launched) and he had a problem to solve:</p>
 
 <p>  <strong>Provide realtime updates in one or several devices after an event triggered by one of those devices</strong></p>
 
 <p>It had to be fault tolerant, performant&hellip; well, business as usual !</p>
 
-<p>By the time i was quite interested in Elixir, and i offered to prototype a solution. It just felt the right tool for the job.</p>
+<p>By the time i was quite interested in Erlang/Elixir, and i offered to prototype a solution. It just felt the right tool for the job.</p>
 
 <p>All in all it was not that different of the canonical &ldquo;hello world&rdquo; of the Erlang VM languages &hellip; the chatroom example.</p>
 
