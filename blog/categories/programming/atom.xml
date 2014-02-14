@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Remote Exception]]></title>
-  <link href="http://pap.github.io/atom.xml" rel="self"/>
+  <title><![CDATA[Category: programming | Remote Exception]]></title>
+  <link href="http://pap.github.io/blog/categories/programming/atom.xml" rel="self"/>
   <link href="http://pap.github.io/"/>
   <updated>2014-02-14T20:07:52+00:00</updated>
   <id>http://pap.github.io/</id>
@@ -56,42 +56,6 @@ I also had to integrate a few libraries to:</p>
 </ol>
 </div>
 
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Changes]]></title>
-    <link href="http://pap.github.io/blog/2014/02/13/changes/"/>
-    <updated>2014-02-13T18:26:08+00:00</updated>
-    <id>http://pap.github.io/blog/2014/02/13/changes</id>
-    <content type="html"><![CDATA[<blockquote><p><strong>They always say time changes things, but you actually have to change them yourself.</strong><br/><cite>Andy Warhol</cite></p></blockquote>
-
-<br/>
-
-
-<h4>Change #1</h4>
-
-<p>So i&rsquo;ve finally decided to change things, since time itself wouldn&rsquo;t move my <a href="http://remoteexception.blogspot.com">blog</a> over to github.</p>
-
-<p>Initially i started the blog to hold portuguese translations of a weekly Burt Beckwith&rsquo;s compilation of Grails related info.</p>
-
-<p>It&rsquo;s time to blog more often.</p>
-
-<p><strong>Change #2</strong></p>
-
-<p>But in the last 3 years a lot has changed. I went from Grails to Rails, deployed a complex application and those steps lead me here &hellip;</p>
-
-<p>Here is where ?</p>
-
-<p>Well here is deciding to learn a functional programming language.</p>
-
-<p>Here is deciding to keep on walking, one step at a time, towards the path of lesser complexity.</p>
-
-<p>Here is Erlang and Elixir.</p>
-
-<p><strong>Change #3</strong></p>
-
-<p>I&rsquo;ve also decided it was time to change from Sublime Text to something more terse. And i did. After a couple of days i&rsquo;ve uninstalled Sublime and i&rsquo;m now a happy vim learner.</p>
 ]]></content>
   </entry>
   
