@@ -4,7 +4,7 @@
   <title><![CDATA[Remote Exception]]></title>
   <link href="http://pap.github.io/atom.xml" rel="self"/>
   <link href="http://pap.github.io/"/>
-  <updated>2014-02-14T20:07:52+00:00</updated>
+  <updated>2014-02-15T02:57:50+00:00</updated>
   <id>http://pap.github.io/</id>
   <author>
     <name><![CDATA[Paulo A Pereira]]></name>
@@ -12,6 +12,298 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Elixir websockets+Mongo+Redis (2)]]></title>
+    <link href="http://pap.github.io/blog/2014/02/14/elixr-websockets-plus-mongo-plus-redis-2/"/>
+    <updated>2014-02-14T13:04:46+00:00</updated>
+    <id>http://pap.github.io/blog/2014/02/14/elixr-websockets-plus-mongo-plus-redis-2</id>
+    <content type="html"><![CDATA[<br/>
+
+
+<h3>Getting Started</h3>
+
+<p>In my previous <a href="http://pap.github.io/blog/2014/02/13/elixr-plus-mongo-plus-redis-plus-websockets/">post</a> i explained what drove me into an implementation of a small OTP app to subscribe json messages in a Redis channel and foward that json to one or several clients.</p>
+
+<p>I&rsquo;ll walktrough some of the code that you can find <a href="https://github.com/pap/ws_pub_sub">here</a>.</p>
+
+<p>The elixir app is under in <a href="https://github.com/pap/ws_pub_sub/tree/master/ws_pub_sub">this folder</a>.</p>
+
+<p>I will assume you already know how to get the app dependencies and how to compile them to get a working elixir app.</p>
+
+<p>The <a href="https://github.com/pap/ws_pub_sub/tree/master/webpage">webpage</a> folder has a webpage with bullet.js to give you a jumpstart.</p>
+
+<p>To start the webpage, if you have python installed, you can run <code>python -m SimpleHTTPServer</code> inside the webpage folder and you will get it at <code>http://localhost:8000</code>.</p>
+
+<br/>
+
+
+<h3>Bootstraping</h3>
+
+<p>As usual in a <code>mix</code> project you will have a <code>mix.exs</code> file and the application modules implemented under the <code>lib</code> dir.</p>
+
+<br/>
+
+
+<p><strong>mix.exs</strong></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='elixir'><span class='line'><span class="k">def</span> <span class="n">application</span> <span class="k">do</span>
+</span><span class='line'><span class="k">  </span><span class="p">[</span>
+</span><span class='line'>    <span class="ss">mod:</span> <span class="p">{</span> <span class="no">WsPubSub</span><span class="p">,</span> <span class="p">[]</span> <span class="p">},</span>
+</span><span class='line'>    <span class="ss">applications:</span> <span class="p">[</span>
+</span><span class='line'>      <span class="ss">:crypto</span><span class="p">,</span>
+</span><span class='line'>      <span class="ss">:compiler</span><span class="p">,</span>
+</span><span class='line'>      <span class="ss">:syntax_tools</span><span class="p">,</span>
+</span><span class='line'>      <span class="ss">:cowlib</span><span class="p">,</span>
+</span><span class='line'>      <span class="ss">:ranch</span><span class="p">,</span>
+</span><span class='line'>      <span class="ss">:cowboy</span><span class="p">,</span>
+</span><span class='line'>      <span class="ss">:bullet</span><span class="p">,</span>
+</span><span class='line'>      <span class="ss">:eredis</span><span class="p">,</span>
+</span><span class='line'>      <span class="ss">:bson</span><span class="p">,</span>
+</span><span class='line'>      <span class="ss">:mongodb</span><span class="p">,</span>
+</span><span class='line'>      <span class="ss">:exredis</span><span class="p">,</span>
+</span><span class='line'>      <span class="ss">:exjson</span><span class="p">,</span>
+</span><span class='line'>      <span class="ss">:jsex</span><span class="p">,</span>
+</span><span class='line'>      <span class="ss">:jsx</span>
+</span><span class='line'>    <span class="p">]</span>
+</span><span class='line'>  <span class="p">]</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Lines 4 to 19:
+Applications defined here are started with the ws_pub_sub app.</p>
+
+<p>Originally i was starting these apps in the start/2 function in <code>lib/ws_pub_sub.ex</code> but this way feels more natural.</p>
+
+<br/>
+
+
+<p><strong>lib/ws_pub_sub.ex</strong></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+</pre></td><td class='code'><pre><code class='elixir'><span class='line'><span class="k">defmodule</span> <span class="no">WsPubSub</span> <span class="k">do</span>
+</span><span class='line'><span class="k">  </span><span class="kn">use</span> <span class="no">Application</span><span class="o">.</span><span class="no">Behaviour</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="n">start</span><span class="p">(</span><span class="n">_type</span><span class="p">,</span> <span class="n">_args</span><span class="p">)</span> <span class="k">do</span>
+</span><span class='line'><span class="k">    </span><span class="c1"># initialize cowboy</span>
+</span><span class='line'>    <span class="n">setup_cowboy</span>
+</span><span class='line'>    <span class="c1"># Initializes the ETS to store connected users</span>
+</span><span class='line'>    <span class="n">_table</span> <span class="o">=</span> <span class="no">ConnectionTable</span><span class="o">.</span><span class="n">init</span>
+</span><span class='line'>    <span class="no">WsPubSub</span><span class="o">.</span><span class="no">Supervisor</span><span class="o">.</span><span class="n">start_link</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">defp</span> <span class="n">setup_cowboy</span> <span class="k">do</span>
+</span><span class='line'><span class="k">    </span><span class="n">my_dispatch</span> <span class="o">=</span> <span class="ss">:cowboy_router</span><span class="o">.</span><span class="n">compile</span><span class="p">([</span>
+</span><span class='line'>                    <span class="p">{</span><span class="ss">:_</span><span class="p">,</span> <span class="p">[{</span><span class="s2">&quot;/websocket&quot;</span><span class="p">,</span> <span class="ss">:buller_handler</span><span class="p">,</span> <span class="p">[{</span><span class="ss">:handler</span><span class="p">,</span> <span class="no">WsHandler</span><span class="p">}]}]}</span>
+</span><span class='line'>                  <span class="p">])</span>
+</span><span class='line'>    <span class="c1"># NOTE: to listen in port 80 you probably need to run the app as sudo</span>
+</span><span class='line'>    <span class="c1"># for demo purpose i&#39;ll start in port 8088</span>
+</span><span class='line'>    <span class="p">{</span><span class="ss">:ok</span><span class="p">,</span> <span class="n">_</span><span class="p">}</span> <span class="o">=</span> <span class="ss">:cowboy</span><span class="o">.</span><span class="n">start_http</span><span class="p">(</span>
+</span><span class='line'>                 <span class="ss">:http</span><span class="p">,</span>
+</span><span class='line'>                 <span class="m">100</span><span class="p">,</span>
+</span><span class='line'>                 <span class="p">[{</span><span class="ss">:port</span><span class="p">,</span> <span class="m">8088</span><span class="p">}],</span>
+</span><span class='line'>                 <span class="p">[{</span><span class="ss">:env</span><span class="p">,</span> <span class="p">[{</span><span class="ss">:dispatch</span><span class="p">,</span> <span class="n">my_dispatch</span><span class="p">}]}]</span>
+</span><span class='line'>               <span class="p">)</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In line 6 we initialize cowboy registering a websocket handler
+module <code>WsHandler</code> with bullet_handler behaviour.</p>
+
+<p>In line 8 we create an ETS table to hold the data (PID + Session Key)
+of all authenticated clients.
+The <code>ConnectionTable.ex</code> module has a few functions defined to make the
+use of ets tables more elixir like and abstract the call of erlang
+functions.
+It allows us to call <code>ConnectionTable.insert(key, value)</code>
+instead of <code>:ets.insert(@table_id, {key, value})</code></p>
+
+<br/>
+
+
+<br/>
+
+
+<h3>Websockets</h3>
+
+<p>The websocket handler is implemented in <code>lib/ws_pub_sub/ws_handler.ex</code>
+Authorizing via mongo could definetly be extracted to its own module but
+i opted to keep the mongo lookup here to allow easier browsing.</p>
+
+<br/>
+
+
+<p><strong>lib/ws_handler.ex</strong></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+</pre></td><td class='code'><pre><code class='elixir'><span class='line'><span class="k">def</span> <span class="n">init</span><span class="p">(</span><span class="n">_transport</span><span class="p">,</span> <span class="n">req</span><span class="p">,</span> <span class="n">_opts</span><span class="p">,</span> <span class="n">_active</span><span class="p">)</span> <span class="k">do</span>
+</span><span class='line'><span class="k">  </span><span class="n">_</span> <span class="o">=</span> <span class="ss">:erlang</span><span class="o">.</span><span class="n">send_after</span><span class="p">(</span><span class="nv">@period</span><span class="p">,</span> <span class="n">self</span><span class="p">,</span> <span class="ss">:refresh</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">{</span><span class="n">qs</span><span class="p">,</span> <span class="n">req2</span><span class="p">}</span> <span class="o">=</span> <span class="ss">:cowboy_req</span><span class="o">.</span><span class="n">qs</span><span class="p">(</span><span class="n">req</span><span class="p">)</span>
+</span><span class='line'>  <span class="c1"># Read the querystring from request</span>
+</span><span class='line'>  <span class="n">state</span> <span class="o">=</span> <span class="no">State</span><span class="p">[</span><span class="ss">guid:</span> <span class="n">qs</span><span class="p">]</span>
+</span><span class='line'>  <span class="c1"># check if key exists</span>
+</span><span class='line'>  <span class="n">connect</span><span class="p">(</span><span class="n">qs</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">{</span><span class="ss">:ok</span><span class="p">,</span> <span class="n">req2</span><span class="p">,</span> <span class="n">state</span><span class="p">}</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">defp</span> <span class="n">connect</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="k">do</span>
+</span><span class='line'><span class="k">  case</span> <span class="n">mongo_auth</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="k">do</span>
+</span><span class='line'><span class="k">    </span><span class="ss">:ok</span> <span class="o">-&gt;</span>
+</span><span class='line'>      <span class="c1"># Key exists. User is allowed to receive updates.</span>
+</span><span class='line'>      <span class="no">ConnectionTable</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="ss">:erlang</span><span class="o">.</span><span class="n">pid_to_list</span><span class="p">(</span><span class="n">self</span><span class="p">))</span>
+</span><span class='line'>      <span class="c1"># Publish in Redis:</span>
+</span><span class='line'>      <span class="c1"># You can notify on a given channel that a user was added</span>
+</span><span class='line'>      <span class="c1"># to the connected users table</span>
+</span><span class='line'>      <span class="ss">:global</span><span class="o">.</span><span class="n">whereis_name</span><span class="p">(</span><span class="ss">:pubsub_exredis_client</span><span class="p">)</span>
+</span><span class='line'>        <span class="o">|&gt;</span> <span class="no">Exredis</span><span class="o">.</span><span class="no">Api</span><span class="o">.</span><span class="n">publish</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="nv">@redis_ws_in_chn</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span class='line'>    <span class="ss">:not_found</span> <span class="o">-&gt;</span>
+</span><span class='line'>      <span class="c1">#TODO: notify user, log attempt etc...</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Line 3:
+We get the querystring from <code>cowboy_req</code>.</p>
+
+<p>Line 7:
+We pass the querystring to mongo to chek if the given key exists.</p>
+
+<p>In <code>lib/ws_handler.ex</code> you will find the mongo connection and query code under
+<code>mongo_auth(key)</code>.
+I think it&rsquo;s easy to follow so i&rsquo;ll skip it &hellip; if you have any doubt open an
+issue on the github repo.</p>
+
+<p>If the key is found we add the user key an pid to the <code>connection table</code>
+and in line 19 we publish a message in a given redis channel to notify
+that a new user is added to the connected users.</p>
+
+<p>That takes us into the <code>RedisPubSub</code> module.</p>
+
+<p>This module is implemented with gen_server behaviour and it is added to
+the app supervisor. This way we can recover from any unexpected failure,
+and keep on listening to messages !</p>
+
+<br/>
+
+
+<p><strong>lib/redis_pub_sub.ex</strong></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='elixir'><span class='line'><span class="k">def</span> <span class="n">init</span><span class="p">(</span><span class="n">_options</span><span class="p">\\[])</span> <span class="k">do</span>
+</span><span class='line'><span class="k">  </span><span class="n">client_sub</span> <span class="o">=</span> <span class="no">Exredis</span><span class="o">.</span><span class="no">Sub</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="nv">@redis_host</span><span class="p">,</span> <span class="nv">@redis_port</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">client</span> <span class="o">=</span> <span class="no">Exredis</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="nv">@redis_host</span><span class="p">,</span> <span class="nv">@redis_port</span><span class="p">)</span>
+</span><span class='line'>  <span class="c1"># Register the PubSub client so it is accessible to publish connection</span>
+</span><span class='line'>  <span class="c1"># and disconnection notifications</span>
+</span><span class='line'>  <span class="ss">:global</span><span class="o">.</span><span class="n">register_name</span><span class="p">(</span><span class="nv">@name</span><span class="p">,</span> <span class="n">client</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">_pid</span> <span class="o">=</span> <span class="no">Kernel</span><span class="o">.</span><span class="n">self</span>
+</span><span class='line'>  <span class="n">state</span> <span class="o">=</span> <span class="no">State</span><span class="p">[</span><span class="ss">client:</span> <span class="n">client</span><span class="p">,</span> <span class="ss">client_sub:</span> <span class="n">client_sub</span><span class="p">]</span>
+</span><span class='line'>  <span class="ss">NOTE:</span> <span class="n">send</span><span class="p">()</span> <span class="n">is</span> <span class="n">defined</span> <span class="ow">in</span> <span class="n">another</span> <span class="n">module</span> <span class="p">(</span><span class="no">MsgPusher</span><span class="p">)</span>
+</span><span class='line'>  <span class="c1"># the function is &quot;registered&quot; as the handler for any message arriving to</span>
+</span><span class='line'>  <span class="c1"># redis @notification_channel</span>
+</span><span class='line'>  <span class="n">client_sub</span> <span class="o">|&gt;</span>
+</span><span class='line'>    <span class="no">Exredis</span><span class="o">.</span><span class="no">Sub</span><span class="o">.</span><span class="n">subscribe</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="nv">@notification_channel</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="k">fn</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="no">MsgPusher</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="k">end</span>
+</span><span class='line'>  <span class="p">{</span><span class="ss">:ok</span><span class="p">,</span> <span class="n">state</span><span class="p">}</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In this particular file i would like to point out lines 12 and 13.</p>
+
+<p>We subscribe a redis channel and the function we pass as the one to be
+executed everytime a message arrives <code>fn(msg) -&gt; MsgPusher.send(msg) end</code>
+simply invokes the send/1 function defined under <code>MsgPusher</code> module.</p>
+
+<p>I will be finishing the webpage soon so you can try this out.</p>
+
+<p>I hope this example may be of use.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Elixir websockets+Mongo+Redis (1)]]></title>

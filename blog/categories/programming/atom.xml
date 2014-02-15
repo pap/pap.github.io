@@ -4,7 +4,7 @@
   <title><![CDATA[Category: programming | Remote Exception]]></title>
   <link href="http://pap.github.io/blog/categories/programming/atom.xml" rel="self"/>
   <link href="http://pap.github.io/"/>
-  <updated>2014-02-14T20:07:52+00:00</updated>
+  <updated>2014-02-15T02:57:50+00:00</updated>
   <id>http://pap.github.io/</id>
   <author>
     <name><![CDATA[Paulo A Pereira]]></name>
@@ -12,6 +12,228 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Elixir websockets+Mongo+Redis (2)]]></title>
+    <link href="http://pap.github.io/blog/2014/02/14/elixr-websockets-plus-mongo-plus-redis-2/"/>
+    <updated>2014-02-14T13:04:46+00:00</updated>
+    <id>http://pap.github.io/blog/2014/02/14/elixr-websockets-plus-mongo-plus-redis-2</id>
+    <content type="html"><![CDATA[<br/>
+
+
+<h3>Getting Started</h3>
+
+<p>In my previous <a href="http://pap.github.io/blog/2014/02/13/elixr-plus-mongo-plus-redis-plus-websockets/">post</a> i explained what drove me into an implementation of a small OTP app to subscribe json messages in a Redis channel and foward that json to one or several clients.</p>
+
+<p>I&rsquo;ll walktrough some of the code that you can find <a href="https://github.com/pap/ws_pub_sub">here</a>.</p>
+
+<p>The elixir app is under in <a href="https://github.com/pap/ws_pub_sub/tree/master/ws_pub_sub">this folder</a>.</p>
+
+<p>I will assume you already know how to get the app dependencies and how to compile them to get a working elixir app.</p>
+
+<p>The <a href="https://github.com/pap/ws_pub_sub/tree/master/webpage">webpage</a> folder has a webpage with bullet.js to give you a jumpstart.</p>
+
+<p>To start the webpage, if you have python installed, you can run <code>python -m SimpleHTTPServer</code> inside the webpage folder and you will get it at <code>http://localhost:8000</code>.</p>
+
+<br/>
+
+
+<h3>Bootstraping</h3>
+
+<p>As usual in a <code>mix</code> project you will have a <code>mix.exs</code> file and the application modules implemented under the <code>lib</code> dir.</p>
+
+<br/>
+
+
+<p><strong>mix.exs</strong></p>
+
+<p>```elixir
+def application do
+  [</p>
+
+<pre><code>mod: { WsPubSub, [] },
+applications: [
+  :crypto,
+  :compiler,
+  :syntax_tools,
+  :cowlib,
+  :ranch,
+  :cowboy,
+  :bullet,
+  :eredis,
+  :bson,
+  :mongodb,
+  :exredis,
+  :exjson,
+  :jsex,
+  :jsx
+]
+</code></pre>
+
+<p>  ]
+end
+```</p>
+
+<p>Lines 4 to 19:
+Applications defined here are started with the ws_pub_sub app.</p>
+
+<p>Originally i was starting these apps in the start/2 function in <code>lib/ws_pub_sub.ex</code> but this way feels more natural.</p>
+
+<br/>
+
+
+<p><strong>lib/ws_pub_sub.ex</strong></p>
+
+<p>```elixir
+defmodule WsPubSub do
+  use Application.Behaviour</p>
+
+<p>  def start(<em>type, </em>args) do</p>
+
+<pre><code># initialize cowboy
+setup_cowboy
+# Initializes the ETS to store connected users
+_table = ConnectionTable.init
+WsPubSub.Supervisor.start_link
+</code></pre>
+
+<p>  end</p>
+
+<p>  defp setup_cowboy do</p>
+
+<pre><code>my_dispatch = :cowboy_router.compile([
+                {:_, [{"/websocket", :buller_handler, [{:handler, WsHandler}]}]}
+              ])
+# NOTE: to listen in port 80 you probably need to run the app as sudo
+# for demo purpose i'll start in port 8088
+{:ok, _} = :cowboy.start_http(
+             :http,
+             100,
+             [{:port, 8088}],
+             [{:env, [{:dispatch, my_dispatch}]}]
+           )
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>In line 6 we initialize cowboy registering a websocket handler
+module <code>WsHandler</code> with bullet_handler behaviour.</p>
+
+<p>In line 8 we create an ETS table to hold the data (PID + Session Key)
+of all authenticated clients.
+The <code>ConnectionTable.ex</code> module has a few functions defined to make the
+use of ets tables more elixir like and abstract the call of erlang
+functions.
+It allows us to call <code>ConnectionTable.insert(key, value)</code>
+instead of <code>:ets.insert(@table_id, {key, value})</code></p>
+
+<br/>
+
+
+<br/>
+
+
+<h3>Websockets</h3>
+
+<p>The websocket handler is implemented in <code>lib/ws_pub_sub/ws_handler.ex</code>
+Authorizing via mongo could definetly be extracted to its own module but
+i opted to keep the mongo lookup here to allow easier browsing.</p>
+
+<br/>
+
+
+<p><strong>lib/ws_handler.ex</strong></p>
+
+<p>```elixir
+def init(<em>transport, req, </em>opts, _active) do
+  _ = :erlang.send_after(@period, self, :refresh)
+  {qs, req2} = :cowboy_req.qs(req)
+  # Read the querystring from request
+  state = State[guid: qs]
+  # check if key exists
+  connect(qs)
+  {:ok, req2, state}
+end</p>
+
+<p>defp connect(key) do
+  case mongo_auth(key) do</p>
+
+<pre><code>:ok -&gt;
+  # Key exists. User is allowed to receive updates.
+  ConnectionTable.insert(key, :erlang.pid_to_list(self))
+  # Publish in Redis:
+  # You can notify on a given channel that a user was added
+  # to the connected users table
+  :global.whereis_name(:pubsub_exredis_client)
+    |&gt; Exredis.Api.publish "#{@redis_ws_in_chn}", "#{key}"
+:not_found -&gt;
+  #TODO: notify user, log attempt etc...
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>Line 3:
+We get the querystring from <code>cowboy_req</code>.</p>
+
+<p>Line 7:
+We pass the querystring to mongo to chek if the given key exists.</p>
+
+<p>In <code>lib/ws_handler.ex</code> you will find the mongo connection and query code under
+<code>mongo_auth(key)</code>.
+I think it&rsquo;s easy to follow so i&rsquo;ll skip it &hellip; if you have any doubt open an
+issue on the github repo.</p>
+
+<p>If the key is found we add the user key an pid to the <code>connection table</code>
+and in line 19 we publish a message in a given redis channel to notify
+that a new user is added to the connected users.</p>
+
+<p>That takes us into the <code>RedisPubSub</code> module.</p>
+
+<p>This module is implemented with gen_server behaviour and it is added to
+the app supervisor. This way we can recover from any unexpected failure,
+and keep on listening to messages !</p>
+
+<br/>
+
+
+<p><strong>lib/redis_pub_sub.ex</strong></p>
+
+<p>```elixir
+def init(<em>options\[]) do
+  client_sub = Exredis.Sub.start(@redis_host, @redis_port)
+  client = Exredis.start(@redis_host, @redis_port)
+  # Register the PubSub client so it is accessible to publish connection
+  # and disconnection notifications
+  :global.register_name(@name, client)
+  </em>pid = Kernel.self
+  state = State[client: client, client_sub: client_sub]
+  NOTE: send() is defined in another module (MsgPusher)
+  # the function is &ldquo;registered&rdquo; as the handler for any message arriving to
+  # redis @notification_channel
+  client_sub |></p>
+
+<pre><code>Exredis.Sub.subscribe "#{@notification_channel}", fn(msg) -&gt; MsgPusher.send(msg) end
+</code></pre>
+
+<p>  {:ok, state}
+end
+```</p>
+
+<p>In this particular file i would like to point out lines 12 and 13.</p>
+
+<p>We subscribe a redis channel and the function we pass as the one to be
+executed everytime a message arrives <code>fn(msg) -&gt; MsgPusher.send(msg) end</code>
+simply invokes the send/1 function defined under <code>MsgPusher</code> module.</p>
+
+<p>I will be finishing the webpage soon so you can try this out.</p>
+
+<p>I hope this example may be of use.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Elixir websockets+Mongo+Redis (1)]]></title>
