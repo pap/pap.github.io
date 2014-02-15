@@ -63,7 +63,7 @@ Applications defined here are started with the ws_pub_sub app.
 Originally i was starting these apps in the start/2 function in `lib/ws_pub_sub.ex` but this way feels more natural.
 
 <br/>
-__lib/ws_pub_sub.ex__
+__ws_pub_sub.ex__
 
 ```elixir
 defmodule WsPubSub do
@@ -112,7 +112,7 @@ Authorizing via mongo could definetly be extracted to its own module but
 i opted to keep the mongo lookup here to allow easier browsing.
 
 <br/>
-__lib/ws_handler.ex__
+__ws_handler.ex__
 
 ```elixir
 def init(_transport, req, _opts, _active) do
@@ -147,7 +147,7 @@ We get the querystring from `cowboy_req`.
 Line 7:
 We pass the querystring to mongo to chek if the given key exists.
 
-In `lib/ws_handler.ex` you will find the mongo connection and query code under
+In `lib/ws_pub_sub/ws_handler.ex` you will find the mongo connection and query code under
 `mongo_auth(key)`.
 I think it's easy to follow so i'll skip it ... if you have any doubt open an
 issue on the github repo.
@@ -163,7 +163,7 @@ the app supervisor. This way we can recover from any unexpected failure,
 and keep on listening to messages !
 
 <br/>
-__lib/redis_pub_sub.ex__
+__redis_pub_sub.ex__
 
 ```elixir
 def init(_options\\[]) do
