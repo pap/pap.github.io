@@ -4,7 +4,7 @@
   <title><![CDATA[Category: programming | Remote Exception]]></title>
   <link href="http://pap.github.io/blog/categories/programming/atom.xml" rel="self"/>
   <link href="http://pap.github.io/"/>
-  <updated>2014-02-15T02:57:50+00:00</updated>
+  <updated>2014-02-15T03:19:31+00:00</updated>
   <id>http://pap.github.io/</id>
   <author>
     <name><![CDATA[Paulo A Pereira]]></name>
@@ -82,7 +82,7 @@ Applications defined here are started with the ws_pub_sub app.</p>
 <br/>
 
 
-<p><strong>lib/ws_pub_sub.ex</strong></p>
+<p><strong>ws_pub_sub.ex</strong></p>
 
 <p>```elixir
 defmodule WsPubSub do
@@ -144,7 +144,7 @@ i opted to keep the mongo lookup here to allow easier browsing.</p>
 <br/>
 
 
-<p><strong>lib/ws_handler.ex</strong></p>
+<p><strong>ws_handler.ex</strong></p>
 
 <p>```elixir
 def init(<em>transport, req, </em>opts, _active) do
@@ -182,7 +182,7 @@ We get the querystring from <code>cowboy_req</code>.</p>
 <p>Line 7:
 We pass the querystring to mongo to chek if the given key exists.</p>
 
-<p>In <code>lib/ws_handler.ex</code> you will find the mongo connection and query code under
+<p>In <code>lib/ws_pub_sub/ws_handler.ex</code> you will find the mongo connection and query code under
 <code>mongo_auth(key)</code>.
 I think it&rsquo;s easy to follow so i&rsquo;ll skip it &hellip; if you have any doubt open an
 issue on the github repo.</p>
@@ -200,7 +200,7 @@ and keep on listening to messages !</p>
 <br/>
 
 
-<p><strong>lib/redis_pub_sub.ex</strong></p>
+<p><strong>redis_pub_sub.ex</strong></p>
 
 <p>```elixir
 def init(<em>options\[]) do
