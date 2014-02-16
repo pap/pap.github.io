@@ -4,7 +4,7 @@
   <title><![CDATA[Category: elixir | Remote Exception]]></title>
   <link href="http://pap.github.io/blog/categories/elixir/atom.xml" rel="self"/>
   <link href="http://pap.github.io/"/>
-  <updated>2014-02-15T03:19:31+00:00</updated>
+  <updated>2014-02-16T23:53:06+00:00</updated>
   <id>http://pap.github.io/</id>
   <author>
     <name><![CDATA[Paulo A Pereira]]></name>
@@ -229,9 +229,18 @@ end
 executed everytime a message arrives <code>fn(msg) -&gt; MsgPusher.send(msg) end</code>
 simply invokes the send/1 function defined under <code>MsgPusher</code> module.</p>
 
-<p>I will be finishing the webpage soon so you can try this out.</p>
+<p>If you want to see some JSON getting into your browser open a redis console (<code>redis-cli</code>).</p>
 
-<p>I hope this example may be of use.</p>
+<p>Inside redis-cli enter:</p>
+
+<p><code>
+PUBLISH "my_channel" "{\"recipients\":[\"00721b2a-046c-4ecc-a5df-5f808cc6c58f\"],\"data\":{\"entry\":{\"id\xe2\x80\x9d:\xe2\x80\x9d123\xe2\x80\x9d,\xe2\x80\x9dcomments\":0,\"tags\":0}}}"`
+</code></p>
+
+<p>As the included example webpage indicates the websocket connection will only be established(authorized) if you have an entry in MongoDB with <code>_id:
+00721b2a-046c-4ecc-a5df-5f808cc6c58f</code></p>
+
+<p>The default database is <code>myDB</code> and the collection <code>myCollection</code>.</p>
 ]]></content>
   </entry>
   
