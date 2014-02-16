@@ -189,8 +189,16 @@ We subscribe a redis channel and the function we pass as the one to be
 executed everytime a message arrives `fn(msg) -> MsgPusher.send(msg) end`
 simply invokes the send/1 function defined under `MsgPusher` module.
 
-I will be finishing the webpage soon so you can try this out.
+If you want to see some JSON getting into your browser open a redis console (`redis-cli`).
 
-I hope this example may be of use.
+Inside redis-cli enter:
 
+```
+PUBLISH "my_channel" "{\"recipients\":[\"00721b2a-046c-4ecc-a5df-5f808cc6c58f\"],\"data\":{\"entry\":{\"id\xe2\x80\x9d:\xe2\x80\x9d123\xe2\x80\x9d,\xe2\x80\x9dcomments\":0,\"tags\":0}}}"`
+```
+
+As the included example webpage indicates the websocket connection will only be established(authorized) if you have an entry in MongoDB with `_id:
+00721b2a-046c-4ecc-a5df-5f808cc6c58f`
+
+The default database is `myDB` and the collection `myCollection`.
 
